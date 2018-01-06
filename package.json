@@ -1,0 +1,24 @@
+{
+  "name": "alexa-nfl-crimes",
+  "version": "1.0.0",
+  "description": "alexa skill for nfl crimes",
+  "main": "index.js",
+  "dependencies": {
+    "alexa-sdk": "^1.0.24",
+    "axios": "^0.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anovis/Alexa-NFL-Crimes.git"
+  },
+  "author": "austen novis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anovis/Alexa-NFL-Crimes/issues"
+  },
+  "homepage": "https://github.com/anovis/Alexa-NFL-Crimes#readme"
+}
