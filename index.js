@@ -43,7 +43,7 @@ const handlers = {
               if (typeof team_name === "undefined")
               {
               console.log('no team')
-              self.emit(':tell', 'Could not recognize the team name')
+              self.emit(':tell', 'Could not recognize the team name. For example ask what is the most common crime on the jets')
               }
           })
         }
@@ -65,9 +65,41 @@ const handlers = {
         if (intentObj.slots.date.value){
             console.log(intentObj.slots.date.value);
         }
-        if (intentObj.slots.team.value){
-            console.log(intentObj.slots.team.value);
-        }
+       if (intentObj.slots.team.value){
+         console.log(intentObj.slots.team.value);
+         team_slot = intentObj.slots.team.value;
+
+         csv()
+         .fromFile(csvFilePath)
+         .on('json',(jsonObj)=>{
+
+             obj = jsonObj
+             if (team_slot.toLowerCase().indexOf(jsonObj['TEAM'].toLowerCase()) > -1)
+             {
+                team_name = jsonObj['NAME']
+                console.log(team_name)
+                Axios.get('http://nflarrest.com/api/v1/team/topPlayers/' + team_name + '?limit=1')
+                  .then(function (response) {
+                    var data = response.data[0]
+                    var response = `The most arrested player on the ${team_slot} is ${data['Name']} with ${data['arrest_count']} arrests`
+                    console.log(response)
+                    self.emit(':tell', response );
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+             }
+         })
+         .on('done',(error)=>{
+             if (typeof team_name === "undefined")
+             {
+             console.log('no team')
+             self.emit(':tell', 'Could not recognize the team name. For example ask who has the most arrests on the jets')
+             }
+         })
+       }
+       else
+       {
         Axios.get('http://nflarrest.com/api/v1/player?limit=1')
           .then(function (response) {
             var data = response.data[0]
@@ -77,13 +109,12 @@ const handlers = {
           .catch(function (error) {
             console.log(error);
           });
+        }
     },
     'TeamIntent': function () {
         const intentObj = this.event.request.intent;
         const self = this;
-        if (intentObj.slots.date.value){
-            console.log(intentObj.slots.date.value);
-        }
+
         Axios.get('http://nflarrest.com/api/v1/team?limit=1')
           .then(function (response) {
             var data = response.data[0]
@@ -93,7 +124,8 @@ const handlers = {
           .catch(function (error) {
             console.log(error);
           });
-    	},
+
+    },
 
 };
 
