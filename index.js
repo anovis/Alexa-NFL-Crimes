@@ -6,7 +6,9 @@ const csvFilePath='nfl-names.csv'
 
 const handlers = {
     'LaunchRequest': function () {
-    	this.emit(':tell', 'Welcome to the NFL Crime skill. What would you like to know?');
+        var repromptSpeech = 'Welcome to the NFL Crime skill. What would you like to know?'
+        this.response.listen(repromptSpeech);
+        this.emit(':responseReady');
 	},
 	'CrimeIntent': function () {
         const intentObj = this.event.request.intent;
@@ -17,33 +19,33 @@ const handlers = {
         if (intentObj.slots.team.value){
           console.log(intentObj.slots.team.value);
           team_slot = intentObj.slots.team.value;
-
+          var response = '';
           csv()
           .fromFile(csvFilePath)
           .on('json',(jsonObj)=>{
-
               obj = jsonObj
               if (team_slot.toLowerCase().indexOf(jsonObj['TEAM'].toLowerCase()) > -1)
               {
                  team_name = jsonObj['NAME']
-                 console.log(team_name)
                  Axios.get('http://nflarrest.com/api/v1/team/topCrimes/' + team_name + '?limit=1')
                    .then(function (response) {
                      var data = response.data[0]
-                     var response = `The most common crime on the ${team_slot} is ${data['Category']} with ${data['arrest_count']} arrests`
-                     console.log(response)
-                     self.emit(':tell', response );
+                     response = `The most common crime on the ${team_slot} is ${data['Category']} with ${data['arrest_count']} arrests`
+                        self.emit(':tell', response );
                    })
                    .catch(function (error) {
                      console.log(error);
                    });
+                   response = 'wait'
               }
           })
           .on('done',(error)=>{
-              if (typeof team_name === "undefined")
+              if (response.length > 2)
               {
-              console.log('no team')
-              self.emit(':tell', 'Could not recognize the team name. For example ask what is the most common crime on the jets')
+               console.log('waiting for axios')
+              }
+              else{
+                self.emit(':tell', 'Could not recognize the team name. For example ask what is the most common crime on the jets')
               }
           })
         }
@@ -68,7 +70,7 @@ const handlers = {
        if (intentObj.slots.team.value){
          console.log(intentObj.slots.team.value);
          team_slot = intentObj.slots.team.value;
-
+        var response = ''
          csv()
          .fromFile(csvFilePath)
          .on('json',(jsonObj)=>{
@@ -81,20 +83,22 @@ const handlers = {
                 Axios.get('http://nflarrest.com/api/v1/team/topPlayers/' + team_name + '?limit=1')
                   .then(function (response) {
                     var data = response.data[0]
-                    var response = `The most arrested player on the ${team_slot} is ${data['Name']} with ${data['arrest_count']} arrests`
-                    console.log(response)
+                    response = `The most arrested player on the ${team_slot} is ${data['Name']} with ${data['arrest_count']} arrests`
                     self.emit(':tell', response );
                   })
                   .catch(function (error) {
                     console.log(error);
                   });
+                  response = 'wait'
              }
          })
          .on('done',(error)=>{
-             if (typeof team_name === "undefined")
-             {
-             console.log('no team')
-             self.emit(':tell', 'Could not recognize the team name. For example ask who has the most arrests on the jets')
+             if (response.length > 2)
+              {
+                console.log('waiting for axios')
+              }
+              else{
+                self.emit(':tell', 'Could not recognize the team name. For example ask who has the most arrests on the jets')
              }
          })
        }
@@ -118,7 +122,7 @@ const handlers = {
         Axios.get('http://nflarrest.com/api/v1/team?limit=1')
           .then(function (response) {
             var data = response.data[0]
-            var response = `The team with the most player arrests is ${data['Team_preffered_name']} with ${data['Name']} arrests`
+            var response = `The team with the most player arrests is ${data['Team_preffered_name']} with ${data['arrest_count']} arrests`
             self.emit(':tell', response);
           })
           .catch(function (error) {
