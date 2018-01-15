@@ -6,8 +6,9 @@ const csvFilePath='nfl-names.csv'
 
 const handlers = {
     'LaunchRequest': function () {
-        var repromptSpeech = 'Welcome to the NFL Crime skill. What would you like to know?'
-        this.response.listen(repromptSpeech);
+        var welcomeSpeech = 'Welcome to the Football Arrests skill. What would you like to know?'
+        var repromptSpeech = 'Anything else you would like to ask?'
+        this.response.speak(welcomeSpeech).listen(repromptSpeech);
         this.emit(':responseReady');
 	},
 	'CrimeIntent': function () {
